@@ -46,7 +46,7 @@ public class TestBucketAwsS3Service implements AwsS3Service {
         } catch (IOException e) {
             return null;
         }
-        return "";
+        return amazonS3Client.getUrl(bucketName, fileName).toString();
     }
 
     private boolean validateFileExists(MultipartFile multipartFile) {
