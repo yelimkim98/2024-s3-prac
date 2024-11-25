@@ -5,4 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface AwsS3Service {
 
     String uploadFile(String category, MultipartFile multipartFile);
+
+    byte[] downloadFileV1(String resourcePath);
 }

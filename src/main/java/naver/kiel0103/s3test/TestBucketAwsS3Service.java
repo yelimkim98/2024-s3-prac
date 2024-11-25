@@ -1,9 +1,8 @@
 package naver.kiel0103.s3test;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
+import com.amazonaws.util.IOUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,10 +49,24 @@ public class TestBucketAwsS3Service implements AwsS3Service {
     }
 
     private boolean validateFileExists(MultipartFile multipartFile) {
-        boolean result = true;
-        if (Objects.isNull(multipartFile) || multipartFile.isEmpty()) {
-            result = false;
+        return !Objects.isNull(multipartFile) && !multipartFile.isEmpty();
+    }
+
+    @Override
+    public byte[] downloadFileV1(String resourcePath) {
+        if (!isFileExistsAtUrl(resourcePath)) {
+            return null;
         }
-        return result;
+        S3Object s3Object = amazonS3Client.getObject(bucketName, resourcePath);
+        S3ObjectInputStream inputStream = s3Object.getObjectContent();
+        try {
+            return IOUtils.toByteArray(inputStream);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private boolean isFileExistsAtUrl(String resourcePath) {
+        return amazonS3Client.doesObjectExist(bucketName, resourcePath);
     }
 }
